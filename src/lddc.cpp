@@ -209,8 +209,15 @@ void Lddc::PublishPointcloud2(LidarDataQueue *queue, uint8_t index) {
 
     PointCloud2 cloud;
     uint64_t timestamp = 0;
+    
+    // double time1, time2; 
+    // time1 = cur_node_->now().seconds();
+
     InitPointcloud2Msg(pkg, cloud, timestamp);
     PublishPointcloud2Data(index, timestamp, cloud);
+
+    // time2 = cur_node_->now().seconds();
+    // std::cout << "time1: " << time1 << " time2:" << time2 << " diff: " << time2 - time1 <<  std::endl;
   }
 }
 
@@ -224,9 +231,17 @@ void Lddc::PublishCustomPointcloud(LidarDataQueue *queue, uint8_t index) {
     }
 
     CustomMsg livox_msg;
+    // double time1, time2; 
+    // time1 = cur_node_->now().seconds();
+
     InitCustomMsg(livox_msg, pkg, index);
     FillPointsToCustomMsg(livox_msg, pkg);
     PublishCustomPointData(livox_msg, index);
+
+    // time2 = cur_node_->now().seconds();
+    // std::cout << "time1: " << time1 << " time2:" << time2 << " diff: " << time2 - time1 <<  std::endl;
+
+
   }
 }
 
@@ -325,7 +340,9 @@ void Lddc::InitPointcloud2Msg(const StoragePacket& pkg, PointCloud2& cloud, uint
     point.reflectivity = pkg.points[i].intensity;
     point.tag = pkg.points[i].tag;
     point.line = pkg.points[i].line;
-    point.timestamp = static_cast<double>(pkg.points[i].offset_time);
+
+    // point.timestamp = static_cast<double>(pkg.points[i].offset_time);
+    point.timestamp = static_cast<double>(pkg.points[i].offset_time - pkg.base_time);
     points.push_back(std::move(point));
   }
   cloud.data.resize(pkg.points_num * sizeof(LivoxPointXyzrtlt));
